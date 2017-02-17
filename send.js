@@ -9,17 +9,20 @@ var localInterface = readline.createInterface({
 	output : process.stdout
 });
 
-localInterface.question('message_to_be_send : ', (message) => {
-	console.log('[SENT]' + message);
-	open.then((conn) => {
-		return conn.createChannel();
-	}).then((channel) => {
-		return channel.assertQueue(queue).then(() => {
-			return channel.sendToQueue(queue, new Buffer(message));
+var mainFunc = () => {
+	localInterface.question('[YOU] ', (message) => {
+		console.log('\b  [SENT]');
+		open.then((conn) => {
+			return conn.createChannel();
+		}).then((channel) => {
+			return channel.assertQueue(queue).then(() => {
+				return channel.sendToQueue(queue, new Buffer(message));
+			});
+		}).then(() => {
+			mainFunc();
+		}).catch((err) => {
+			console.log(err);
 		});
-	}).catch((err) => {
-		console.log(err);
 	});
-});
-
-
+}
+mainFunc();
